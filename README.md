@@ -47,11 +47,6 @@ Run the `visualisation.py` script to observe and compare the performance of grad
 python visualisation.py
 ```
 
-## Dependencies
-Make sure the following libraries are included in the `requirements.txt`:
-- `numpy`
-- `matplotlib`
-- `pandas`
 
 ## Usage
 Modify the parameters in the script to adjust the gradient descent settings and observe how different configurations impact performance. Visualizations will help you analyze the results.
