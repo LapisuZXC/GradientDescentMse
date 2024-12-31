@@ -4,7 +4,7 @@ import numpy as np
 
 class GradientDescentMse:
     """
-    Базовый класс для реализации градиентного спуска в задаче линейной МНК регрессии
+    Base class for implementing gradient descent in linear MSE regression
     """
 
     def __init__(
@@ -16,13 +16,14 @@ class GradientDescentMse:
         copy: bool = True,
     ):
         """
-        self.samples - матрица признаков
-        self.targets - вектор таргетов
-        self.beta - вектор из изначальными весами модели == коэффициентами бета (состоит из единиц)
-        self.learning_rate - параметр *learning_rate* для корректировки нормы градиента
-        self.threshold - величина, меньше которой изменение в loss-функции означает остановку градиентного спуска
-        iteration_loss_dict - словарь, который будет хранить номер итерации и соответствующую MSE
-        copy: копирование матрицы признаков или создание изменения in-place
+        Initialize parameters:
+        - samples: feature matrix
+        - targets: target vector
+        - beta: model weights (initialized to ones)
+        - learning_rate: learning rate for gradient correction
+        - threshold: convergence threshold
+        - iteration_loss_dict: dictionary to store iteration number and MSE
+        - copy: whether to copy the feature matrix or modify it in place
         """
         self.samples = samples.copy() if copy else samples
         self.targets = targets
@@ -33,75 +34,64 @@ class GradientDescentMse:
 
     def add_constant_feature(self):
         """
-        Метод для создания константной фичи в матрице объектов samples.
+        Adds a constant feature to the feature matrix.
         """
-        self.samples["constant"] = 1  # Добавляем столбец с единицами
+        self.samples["constant"] = 1  # Add a column of ones
         self.beta = np.ones(self.samples.shape[1])
 
     def calculate_mse_loss(self) -> float:
         """
-        Метод для расчета среднеквадратической ошибки
-
-        :return: среднеквадратическая ошибка при текущих весах модели : float
+        Calculate the mean squared error (MSE).
+        :return: MSE for the current model weights
         """
         error = np.dot(self.samples, self.beta) - self.targets
         return float(np.mean((error**2)))
 
     def calculate_gradient(self) -> np.ndarray:
         """
-        Метод для вычисления вектора-градиента
-        Метод возвращает вектор-градиент, содержащий производные по каждому признаку.
-        Сначала матрица признаков скалярно перемножается на вектор self.beta, и из каждой колонки
-        полученной матрицы вычитается вектор таргетов. Затем полученная матрица скалярно умножается на матрицу признаков.
-        Наконец, итоговая матрица умножается на 2 и усредняется по каждому признаку.
-
-        :return: вектор-градиент, т.е. массив, содержащий соответствующее количество производных по каждой переменной : np.ndarray
+        Compute the gradient vector.
+        :return: gradient vector with partial derivatives for each feature
         """
-
         error = np.dot(self.samples, self.beta) - self.targets
         gradient = 2 * np.dot(error, self.samples) / self.samples.shape[0]
         return gradient
 
     def iteration(self):
         """
-        Обновляем веса модели в соответствии с текущим вектором-градиентом
+        Update model weights using the current gradient.
         """
         nabla_Q = self.calculate_gradient()
         self.beta = self.beta - self.learning_rate * nabla_Q
 
     def learn(self):
         """
-        Итеративное обучение весов модели до срабатывания критерия останова
-        Запись mse и номера итерации в iteration_loss_dict
+        Iteratively train model weights until the convergence criterion is met.
+        MSE and iteration number are recorded in iteration_loss_dict.
 
-        Описание алгоритма работы для изменения бет:
-            Фиксируем текущие beta -> start_betas
-            Делаем шаг градиентного спуска
-            Записываем новые beta -> new_betas
-            Пока |L(new_beta) - L(start_beta)| >= threshold:
-                Повторяем первые 3 шага
+        Algorithm for beta updates:
+        - Fix the current beta -> start_betas
+        - Perform a gradient descent step
+        - Record new beta -> new_betas
+        - Repeat until |L(new_beta) - L(start_beta)| < threshold
 
-        Описание алгоритма работы для изменения функции потерь:
-            Фиксируем текущие mse -> previous_mse
-            Делаем шаг градиентного спуска
-            Записываем новые mse -> next_mse
-            Пока |(previous_mse) - (next_mse)| >= threshold:
-                Повторяем первые 3 шага
+        Algorithm for loss function updates:
+        - Fix the current MSE -> previous_mse
+        - Perform a gradient descent step
+        - Record new MSE -> next_mse
+        - Repeat until |previous_mse - next_mse| < threshold
         """
-
-        i = 1  # Счетчик итераций
-        previous_mse = self.calculate_mse_loss()  # Текущая ошибка
-        # Сохраняем начальную ошибку
+        i = 1  # Iteration counter
+        previous_mse = self.calculate_mse_loss()
         self.iteration_loss_dict[i] = previous_mse
 
         while True:
-            self.iteration()  # Выполняем шаг градиентного спуска
-            next_mse = self.calculate_mse_loss()  # Новая ошибка
+            self.iteration()
+            next_mse = self.calculate_mse_loss()
             i += 1
-            self.iteration_loss_dict[i] = next_mse  # Сохраняем ошибку
+            self.iteration_loss_dict[i] = next_mse
 
-            # Проверяем условие остановки
+            # Check the convergence condition
             if np.abs(previous_mse - next_mse) < self.threshold:
                 break
 
-            previous_mse = next_mse  # Обновляем предыдущую ошибку
+            previous_mse = next_mse

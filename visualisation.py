@@ -2,28 +2,25 @@ import matplotlib.pyplot as plt
 from GradientDescentMse import GradientDescentMse
 import pandas as pd
 
-df = pd.read_csv("example_data.csv")
-
+df = pd.read_csv("example_data.csv")  # or you can change data for yours
+# you'll need to adjust sample and target
 X = df.drop(columns="target")
 Y = df["target"]
 
 
-# Параметры обучения
+# parameters
 threshold_list = [1e-2, 1e-3, 1e-4, 1e-5]
 learning_rate_list = [1e-1, 5e-2, 1e-2, 5e-3, 1e-3]
 
-# Словари для хранения результатов
 models_dict = {}
 loss_dict = {}
 weights_dict = {}
 
-# Обучение моделей
 for threshold in threshold_list:
     models_dict[threshold] = {}
     loss_dict[threshold] = {}
     weights_dict[threshold] = {}
     for learning_rate in learning_rate_list:
-        # Создаём модель
         model = GradientDescentMse(
             samples=X.copy(),
             targets=Y,
@@ -33,14 +30,15 @@ for threshold in threshold_list:
         model.add_constant_feature()
         model.learn()
 
-        # Сохраняем результаты
         models_dict[threshold][learning_rate] = model
         loss_dict[threshold][learning_rate] = model.iteration_loss_dict
         weights_dict[threshold][learning_rate] = model.beta
 
-# Построение траекторий обучения
-fig, axes = plt.subplots(len(threshold_list), len(learning_rate_list), figsize=(15, 10))
-fig.suptitle("Learning Paths for Various Thresholds and Learning Rates", fontsize=16)
+# visualisation
+fig, axes = plt.subplots(len(threshold_list), len(
+    learning_rate_list), figsize=(15, 10))
+fig.suptitle(
+    "Learning Paths for Various Thresholds and Learning Rates", fontsize=16)
 
 for i, threshold in enumerate(threshold_list):
     for j, learning_rate in enumerate(learning_rate_list):
@@ -54,7 +52,7 @@ for i, threshold in enumerate(threshold_list):
 plt.tight_layout(rect=[0, 0.03, 1, 0.95])
 plt.show()
 
-# Вывод весов для интерпретации
+# weights output for interpretation
 for threshold in threshold_list:
     for learning_rate in learning_rate_list:
         print(f"Threshold: {threshold}, Learning Rate: {learning_rate}")
