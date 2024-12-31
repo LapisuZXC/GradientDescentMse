@@ -51,7 +51,7 @@ python visualisation.py
 Make sure the following libraries are included in the `requirements.txt`:
 - `numpy`
 - `matplotlib`
-- (Add any other libraries your script requires)
+- `pandas`
 
 ## Usage
 Modify the parameters in the script to adjust the gradient descent settings and observe how different configurations impact performance. Visualizations will help you analyze the results.
