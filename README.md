@@ -13,7 +13,7 @@ Follow the steps below to set up and run the script:
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/LapisuZXC/GradientDescentMse
+git clone https://github.com/LapisuZXC/GradientDescentMse.git
 cd GradientDescentMse
 ```
 
